@@ -4,6 +4,7 @@ package com.launchdarkly;
 import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
+import android.net.Uri;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -24,6 +25,7 @@ import com.launchdarkly.android.LDUser;
 import com.launchdarkly.android.LaunchDarklyException;
 
 import java.util.HashSet;
+import java.util.Map;
 
 public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
 
@@ -42,12 +44,141 @@ public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void configure(String apiKey, ReadableMap options, Promise promise) {
-    LDConfig ldConfig = new LDConfig.Builder()
-            .setMobileKey(apiKey)
-            .build();
+  public void configure(String apiKey, ReadableMap options, ReadableMap userOptions, Promise promise) {
+    user = userBuilderFromOptions(userOptions).build();
 
-    LDUser.Builder userBuilder = new LDUser.Builder(options.getString("key"));
+    if (ldClient != null) {
+      ldClient.identify(user);
+      WritableMap map = Arguments.createMap();
+      if (userOptions.hasKey("email")) {
+        map.putString("email", userOptions.getString("email"));
+      }
+      promise.resolve(map);
+      return;
+    }
+
+    LDConfig ldConfig = buildConfig(apiKey, options);
+
+    Activity reactActivity = reactContext.getCurrentActivity();
+
+    if (reactActivity != null && reactActivity.getApplication() != null) {
+      ldClient = LDClient.init(reactActivity.getApplication(), ldConfig, user, 0);
+      WritableMap map = Arguments.createMap();
+      if (userOptions.hasKey("email")) {
+        map.putString("email", userOptions.getString("email"));
+      }
+      promise.resolve(map);
+    } else {
+      String message;
+      if (reactActivity == null) {
+        message = "Couldn't init RNLaunchDarklyModule because activity was null";
+      } else {
+        message = "Couldn't init RNLaunchDarklyModule because application was null";
+      }
+      Log.d("RNLaunchDarklyModule", message);
+      promise.reject(new Throwable(message));
+    }
+  }
+
+  @ReactMethod
+  public void identify(ReadableMap options) {
+    Log.d("RNLaunchDarklyModule", "identify");
+
+    user = userBuilderFromOptions(options).build();
+    ldClient.identify(user);
+  }
+
+  @ReactMethod
+  public void allFlags(Promise promise) {
+      Map<String, ?> map = ldClient.allFlags();
+
+      // copy to WritableMap for react-native bridge
+      WritableMap data = Arguments.createMap();
+      for (Map.Entry<String, ?> entry : map.entrySet()) {
+          String key = entry.getKey();
+
+          String type = entry.getValue().getClass().getName();
+                  Log.d("RNLaunchDarklyModule", "map " + key + ":" + type);
+          switch(type) {
+            case "java.lang.Boolean": 
+               data.putBoolean(key, (Boolean) entry.getValue());
+               break;
+            case "java.lang.String": 
+               data.putString(key, (String) entry.getValue());
+               break;
+          }
+      }
+
+      promise.resolve(data);
+  }
+
+  @ReactMethod
+  public void addFeatureFlagChangeListener(String flagName) {
+    FeatureFlagChangeListener listener = new FeatureFlagChangeListener() {
+      @Override
+      public void onFeatureFlagChange(String flagKey) {
+        WritableMap result = Arguments.createMap();
+        result.putString("flagName", flagKey);
+
+        getReactApplicationContext()
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("FeatureFlagChanged", result);
+      }
+    };
+
+    try {
+      LDClient.get().registerFeatureFlagListener(flagName, listener);
+    } catch (LaunchDarklyException e) {
+      Log.d("RNLaunchDarklyModule", e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  @ReactMethod
+  public void boolVariation(String flagName, Promise promise) {
+    Log.d("RNLaunchDarklyModule", "boolVariation:" + flagName);
+
+    Boolean variationResult = ldClient.boolVariation(flagName, false);
+    promise.resolve(variationResult);
+  }
+
+  @ReactMethod
+  public void stringVariation(String flagName, String fallback, Promise promise) {
+    Log.d("RNLaunchDarklyModule", "stringVariation:" + flagName);
+
+    String variationResult = ldClient.stringVariation(flagName, fallback);
+    promise.resolve(variationResult);
+  }
+
+  private LDConfig buildConfig(String apiKey, ReadableMap options) {
+    LDConfig.Builder configBuilder = new LDConfig.Builder()
+    .setStream(false)
+        .setMobileKey(apiKey);
+
+    if (options.hasKey("baseUrl")) {
+      configBuilder.setBaseUri(Uri.parse(options.getString("baseUrl")));
+    }
+
+    if (options.hasKey("eventsUrl")) {
+      configBuilder.setEventsUri(Uri.parse(options.getString("eventsUrl")));
+    }
+
+    if (options.hasKey("streaming")) {
+      configBuilder.setStream(options.getBoolean("streaming"));
+    }
+
+    LDConfig ldConfig = configBuilder.build();
+
+    return ldConfig;
+  }
+
+  private LDUser.Builder userBuilderFromOptions(ReadableMap options) {
+    String userKey = null;
+    if (options.hasKey("key")) {
+      userKey = options.getString("key");
+    }
+
+    LDUser.Builder userBuilder = new LDUser.Builder(userKey);
 
     if (options.hasKey("email")) {
       userBuilder = userBuilder.email(options.getString("email"));
@@ -80,61 +211,6 @@ public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
       }
     }
 
-    if (user != null && ldClient != null) {
-      user = userBuilder.build();
-      ldClient.identify(user);
-      WritableMap map = Arguments.createMap();
-      map.putString("email", options.getString("email"));
-      promise.resolve(map);
-      return;
-    }
-
-    user = userBuilder.build();
-
-    Activity reactActivity = reactContext.getCurrentActivity();
-
-    if (reactActivity != null && reactActivity.getApplication() != null) {
-      ldClient = LDClient.init(reactActivity.getApplication(), ldConfig, user, 0);
-      WritableMap map = Arguments.createMap();
-      map.putString("email", options.getString("email"));
-      promise.resolve(map);
-    } else {
-      Log.d("RNLaunchDarklyModule", "Couldn't init RNLaunchDarklyModule cause application was null");
-      promise.reject(new Throwable("Couldn't init RNLaunchDarklyModule cause application was null"));
-    }
-  }
-
-  @ReactMethod
-  public void addFeatureFlagChangeListener (String flagName) {
-    FeatureFlagChangeListener listener = new FeatureFlagChangeListener() {
-      @Override
-      public void onFeatureFlagChange(String flagKey) {
-        WritableMap result = Arguments.createMap();
-        result.putString("flagName", flagKey);
-
-        getReactApplicationContext()
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit("FeatureFlagChanged", result);
-      }
-    };
-
-    try {
-      LDClient.get().registerFeatureFlagListener(flagName, listener);
-    } catch (LaunchDarklyException e) {
-      Log.d("RNLaunchDarklyModule", e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
-  @ReactMethod
-  public void boolVariation(String flagName, Callback callback) {
-    Boolean variationResult = ldClient.boolVariation(flagName, false);
-    callback.invoke(variationResult);
-  }
-
-  @ReactMethod
-  public void stringVariation(String flagName, String fallback, Callback callback) {
-    String variationResult = ldClient.stringVariation(flagName, fallback);
-    callback.invoke(variationResult);
+    return userBuilder;
   }
 }
