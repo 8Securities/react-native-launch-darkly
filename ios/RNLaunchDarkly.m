@@ -33,6 +33,8 @@ RCT_EXPORT_METHOD(configure:(NSString*)apiKey
 
     if ([streaming isEqualToNumber:[NSNumber numberWithBool:YES]]) {
         [config withStreaming:TRUE];
+    } else {
+        [config withStreaming:FALSE];
     }
 
     LDUserBuilder *user = [RNLaunchDarkly userBuilderFromOptions:userOptions];
@@ -40,10 +42,9 @@ RCT_EXPORT_METHOD(configure:(NSString*)apiKey
     if ( self.user ) {
         self.user = [user build];
         bool updatedSuccesfully = [[LDClient sharedInstance] updateUser:user];
-        NSString* key           = userOptions[@"key"];
-        NSString* email           = userOptions[@"email"];
+        NSString* key = self.user.key;
         NSLog(@"LaunchDarkly User was updated. Key=%@ IsSuccess=%@", key, updatedSuccesfully ? @"YES" : @"NO");
-        resolve(@{ @"email": email});
+        resolve(@{ @"key": key});
         return;
     }
 
@@ -56,15 +57,15 @@ RCT_EXPORT_METHOD(configure:(NSString*)apiKey
      object:nil];
 
     [[LDClient sharedInstance] start:config userBuilder:user];
-    NSString* email           = userOptions[@"email"];
-    resolve(@{ @"email": email});
+    NSString* key = self.user.key;
+    resolve(@{ @"key": key});
 }
 
 RCT_EXPORT_METHOD(identify:(NSDictionary*)userOptions) {
     LDUserBuilder *user = [RNLaunchDarkly userBuilderFromOptions:userOptions];
     self.user = [user build];
     bool updatedSuccesfully = [[LDClient sharedInstance] updateUser:user];
-    NSString* key           = userOptions[@"key"];
+    NSString* key = self.user.key;
     NSLog(@"LaunchDarkly User was updated. Key=%@ IsSuccess=%@", key, updatedSuccesfully ? @"YES" : @"NO");
 }
 
