@@ -1,14 +1,16 @@
-declare class LaunchDarkly {
-    emitter: any;
-    listeners: any;
-    constructor();
-    configure(apiKey: string, options: any, userOptions: any): any;
-    identify(userOptions: any): void;
-    allFlags(): any;
-    boolVariation(featureName: string): any;
-    stringVariation(featureName: string, fallback?: string): any;
-    addFeatureFlagChangeListener(featureName: string, callback: any): void;
-    unsubscribe(): void;
+import BoolFlag from "./components/BoolFlag";
+import withFlagsConsumer, { FlagsConsumerProps } from "./components/withFlagsConsumer";
+import withFlagsProvider, { ProviderConfig } from "./components/withFlagsProvider";
+export interface ClientOptions {
+    streaming?: boolean;
+    baseUrl?: string;
+    eventsUrl?: string;
 }
-declare const _default: LaunchDarkly;
-export default _default;
+export interface UserOptions {
+    key?: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    isAnonymous?: boolean;
+}
+export { BoolFlag, withFlagsConsumer, FlagsConsumerProps, withFlagsProvider, ProviderConfig };
