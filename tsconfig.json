@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["es2015"],
+    "jsx": "react-native",
+    "strict": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "typeRoots": ["node_modules/@types"],
+    "esModuleInterop": true,
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

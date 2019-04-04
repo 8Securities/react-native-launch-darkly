@@ -2,9 +2,10 @@
   "name": "react-native-launch-darkly",
   "version": "0.0.9",
   "description": "React Native wrapper over LaunchDarkly SDK's for iOS and Android.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -rf dist && tsc --skipLibCheck"
   },
   "keywords": [
     "react-native",
@@ -19,5 +20,9 @@
   },
   "peerDependencies": {
     "react-native": "^0.41.2"
+  },
+  "devDependencies": {
+    "@types/react-native": "0.57.42",
+    "typescript": "3.4.1"
   }
 }
