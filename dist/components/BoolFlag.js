@@ -71,7 +71,7 @@ var BoolFlag = /** @class */ (function (_super) {
             flagsClient.addFeatureFlagChangeListener(flagName, _this.updateFlag);
         };
         _this.state = {
-            flagValue: false
+            flagValue: undefined
         };
         return _this;
     }
@@ -88,8 +88,11 @@ var BoolFlag = /** @class */ (function (_super) {
                         flagValue = _b.sent();
                         this.setState({ flagValue: flagValue });
                         this.subscribeToChanges(flagName, flagsClient);
-                        _b.label = 2;
-                    case 2: return [2 /*return*/];
+                        return [3 /*break*/, 3];
+                    case 2:
+                        console.log("no client");
+                        _b.label = 3;
+                    case 3: return [2 /*return*/];
                 }
             });
         });
@@ -101,7 +104,12 @@ var BoolFlag = /** @class */ (function (_super) {
     BoolFlag.prototype.render = function () {
         var children = this.props.children;
         var flagValue = this.state.flagValue;
-        return <>{children({ flagValue: flagValue })}</>;
+        if (flagValue === undefined) {
+            return null;
+        }
+        else {
+            return <>{children({ flagValue: flagValue })}</>;
+        }
     };
     return BoolFlag;
 }(React.Component));

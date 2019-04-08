@@ -4,7 +4,7 @@
  */
 interface Props {
     flagName: string;
-    children(state: BoolFlagsProps): JSX.Element;
+    children(props: BoolFlagsProps): JSX.Element;
 }
 export interface BoolFlagsProps {
     flagValue: boolean;
