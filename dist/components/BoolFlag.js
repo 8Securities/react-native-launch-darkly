@@ -88,11 +88,8 @@ var BoolFlag = /** @class */ (function (_super) {
                         flagValue = _b.sent();
                         this.setState({ flagValue: flagValue });
                         this.subscribeToChanges(flagName, flagsClient);
-                        return [3 /*break*/, 3];
-                    case 2:
-                        console.log("no client");
-                        _b.label = 3;
-                    case 3: return [2 /*return*/];
+                        _b.label = 2;
+                    case 2: return [2 /*return*/];
                 }
             });
         });
