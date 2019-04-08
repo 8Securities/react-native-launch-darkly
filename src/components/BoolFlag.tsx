@@ -44,8 +44,6 @@ class BoolFlag extends React.Component<Props & FlagsConsumerProps, State> {
       const flagValue = await flagsClient.boolVariation(flagName);
       this.setState({ flagValue });
       this.subscribeToChanges(flagName, flagsClient);
-    } else {
-      console.log("no client");
     }
   }
 
