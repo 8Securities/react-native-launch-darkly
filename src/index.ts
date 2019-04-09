@@ -5,6 +5,7 @@ import withFlagsConsumer, {
 import withFlagsProvider, {
   ProviderConfig
 } from "./components/withFlagsProvider";
+import { LaunchDarkly } from "./components/client";
 
 export interface ClientOptions {
   streaming?: boolean;
@@ -21,6 +22,7 @@ export interface UserOptions {
 }
 
 export {
+  LaunchDarkly,
   BoolFlag,
   withFlagsConsumer,
   FlagsConsumerProps,

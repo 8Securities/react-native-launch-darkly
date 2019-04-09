@@ -8,24 +8,25 @@ import withFlagsConsumer, { FlagsConsumerProps } from "./withFlagsConsumer";
 
 interface Props {
   flagName: string;
-  children(state: BoolFlagsProps): JSX.Element;
+  children(props: BoolFlagsProps): JSX.Element;
 }
 
 export interface BoolFlagsProps {
   flagValue: boolean;
 }
 
-class BoolFlag extends React.Component<
-  Props & FlagsConsumerProps,
-  BoolFlagsProps
-> {
-  readonly state: Readonly<BoolFlagsProps>;
+interface State {
+  flagValue?: boolean;
+}
+
+class BoolFlag extends React.Component<Props & FlagsConsumerProps, State> {
+  readonly state: Readonly<State>;
 
   constructor(props: Props & FlagsConsumerProps) {
     super(props);
 
     this.state = {
-      flagValue: false
+      flagValue: undefined
     };
   }
 
@@ -54,7 +55,11 @@ class BoolFlag extends React.Component<
   render() {
     const { children } = this.props;
     const { flagValue } = this.state;
-    return <>{children({ flagValue })}</>;
+    if (flagValue === undefined) {
+      return null;
+    } else {
+      return <>{children({ flagValue })}</>;
+    }
   }
 }
 

@@ -71,7 +71,7 @@ var BoolFlag = /** @class */ (function (_super) {
             flagsClient.addFeatureFlagChangeListener(flagName, _this.updateFlag);
         };
         _this.state = {
-            flagValue: false
+            flagValue: undefined
         };
         return _this;
     }
@@ -101,7 +101,12 @@ var BoolFlag = /** @class */ (function (_super) {
     BoolFlag.prototype.render = function () {
         var children = this.props.children;
         var flagValue = this.state.flagValue;
-        return <>{children({ flagValue: flagValue })}</>;
+        if (flagValue === undefined) {
+            return null;
+        }
+        else {
+            return <>{children({ flagValue: flagValue })}</>;
+        }
     };
     return BoolFlag;
 }(React.Component));
