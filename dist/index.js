@@ -9,3 +9,5 @@ var withFlagsConsumer_1 = __importDefault(require("./components/withFlagsConsume
 exports.withFlagsConsumer = withFlagsConsumer_1.default;
 var withFlagsProvider_1 = __importDefault(require("./components/withFlagsProvider"));
 exports.withFlagsProvider = withFlagsProvider_1.default;
+var client_1 = require("./components/client");
+exports.LaunchDarkly = client_1.LaunchDarkly;
