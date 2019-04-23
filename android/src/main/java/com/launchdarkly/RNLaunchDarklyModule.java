@@ -67,6 +67,7 @@ public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
       if (userOptions.hasKey("email")) {
         map.putString("email", userOptions.getString("email"));
       }
+      Log.d("RNLaunchDarklyModule", ldConfig.getBaseUri().toString());
       promise.resolve(map);
     } else {
       String message;
@@ -161,6 +162,10 @@ public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
 
     if (options.hasKey("eventsUrl")) {
       configBuilder.setEventsUri(Uri.parse(options.getString("eventsUrl")));
+    }
+
+    if (options.hasKey("streamUrl")) {
+      configBuilder.setStreamUri(Uri.parse(options.getString("streamUrl")));
     }
 
     if (options.hasKey("streaming")) {
