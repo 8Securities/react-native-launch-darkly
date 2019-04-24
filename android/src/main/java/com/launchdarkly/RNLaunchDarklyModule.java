@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -16,6 +17,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.common.collect.Sets;
 import com.launchdarkly.android.FeatureFlagChangeListener;
@@ -30,12 +32,14 @@ import java.util.Map;
 public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
+  private final Application application;
   private LDClient ldClient;
   private LDUser user;
 
   public RNLaunchDarklyModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+    this.application = (Application) reactContext.getApplicationContext();
   }
 
   @Override
@@ -44,11 +48,11 @@ public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void configure(String apiKey, ReadableMap options, ReadableMap userOptions, Promise promise) {
-    user = userBuilderFromOptions(userOptions).build();
+  public void configure(@NonNull String apiKey, @NonNull ReadableMap options, @NonNull ReadableMap userOptions, @NonNull Promise promise) {
+    this.user = userBuilderFromOptions(userOptions).build();
 
-    if (ldClient != null) {
-      ldClient.identify(user);
+    if (this.ldClient != null) {
+      this.ldClient.identify(user);
       WritableMap map = Arguments.createMap();
       if (userOptions.hasKey("email")) {
         map.putString("email", userOptions.getString("email"));
@@ -59,26 +63,13 @@ public class RNLaunchDarklyModule extends ReactContextBaseJavaModule {
 
     LDConfig ldConfig = buildConfig(apiKey, options);
 
-    Activity reactActivity = reactContext.getCurrentActivity();
-
-    if (reactActivity != null && reactActivity.getApplication() != null) {
-      ldClient = LDClient.init(reactActivity.getApplication(), ldConfig, user, 0);
-      WritableMap map = Arguments.createMap();
-      if (userOptions.hasKey("email")) {
-        map.putString("email", userOptions.getString("email"));
-      }
-      Log.d("RNLaunchDarklyModule", ldConfig.getBaseUri().toString());
-      promise.resolve(map);
-    } else {
-      String message;
-      if (reactActivity == null) {
-        message = "Couldn't init RNLaunchDarklyModule because activity was null";
-      } else {
-        message = "Couldn't init RNLaunchDarklyModule because application was null";
-      }
-      Log.d("RNLaunchDarklyModule", message);
-      promise.reject(new Throwable(message));
+    this.ldClient = LDClient.init(this.application, ldConfig, user, 1);
+    WritableMap map = Arguments.createMap();
+    if (userOptions.hasKey("email")) {
+      map.putString("email", userOptions.getString("email"));
     }
+    Log.d("RNLaunchDarklyModule", apiKey + " initialized with host " + ldConfig.getBaseUri().toString());
+    promise.resolve(map);
   }
 
   @ReactMethod
