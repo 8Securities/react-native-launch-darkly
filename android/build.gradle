@@ -5,10 +5,11 @@ def safeExtGet(prop, fallback) {
 buildscript {
     repositories {
         jcenter()
+        google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
 
@@ -16,7 +17,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion safeExtGet('compileSdkVersion', 26)
-    buildToolsVersion safeExtGet('buildToolsVersion', '26.0.2')
 
     defaultConfig {
         minSdkVersion safeExtGet('minSdkVersion', 16)
@@ -30,10 +30,13 @@ android {
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
+    google()
 }
 
 dependencies {
+    implementation 'com.facebook.react:react-native:+'
+    implementation "com.google.guava:guava:16+"
     implementation "com.facebook.react:react-native:${safeExtGet('reactNative', '+')}"
     implementation('com.launchdarkly:launchdarkly-android-client:2.5.1') {
         exclude group: 'com.squareup.okhttp', module: 'okhttp'
