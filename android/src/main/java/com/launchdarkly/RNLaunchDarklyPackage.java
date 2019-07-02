@@ -12,15 +12,6 @@ import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
 public class RNLaunchDarklyPackage implements ReactPackage {
 
-    /**
-     * Not used, but required to properly implement the interface
-     * @return
-     */
-    @Override
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
-        return null;
-    }
-
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
       return Arrays.<NativeModule>asList(new RNLaunchDarklyModule(reactContext));
