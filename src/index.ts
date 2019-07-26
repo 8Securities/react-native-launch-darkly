@@ -1,11 +1,10 @@
-import BoolFlag from "./components/BoolFlag";
-import withFlagsConsumer, {
-  FlagsConsumerProps
-} from "./components/withFlagsConsumer";
-import withFlagsProvider, {
-  ProviderConfig
-} from "./components/withFlagsProvider";
 import { LaunchDarkly } from "./components/client";
+import {
+  FlagsProvider,
+  FlagsProviderProps,
+  useFlagsClient
+} from "./components/FlagsProvider";
+import { useBoolFlag } from "./components/useBoolFlag";
 
 export interface ClientOptions {
   streaming?: boolean;
@@ -23,9 +22,8 @@ export interface UserOptions {
 
 export {
   LaunchDarkly,
-  BoolFlag,
-  withFlagsConsumer,
-  FlagsConsumerProps,
-  withFlagsProvider,
-  ProviderConfig
+  FlagsProvider,
+  FlagsProviderProps,
+  useFlagsClient,
+  useBoolFlag
 };
