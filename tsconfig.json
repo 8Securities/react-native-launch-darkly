@@ -1,15 +1,13 @@
 {
+  "include": ["src/**/*.ts", "src/**/*.tsx", "typings/**/*.ts"],
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": ["es2015"],
-    "jsx": "react-native",
+    "jsx": "react",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "lib": ["dom", "es2015", "esnext.asynciterable"],
+
     "strict": true,
-    "declaration": true,
-    "outDir": "./dist",
-    "typeRoots": ["node_modules/@types"],
-    "esModuleInterop": true,
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  }
 }

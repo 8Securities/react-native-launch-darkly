@@ -2,10 +2,19 @@
   "name": "react-native-launch-darkly",
   "version": "0.0.12",
   "description": "React Native wrapper over LaunchDarkly SDK's for iOS and Android.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "es"
+  ],
   "scripts": {
-    "build": "rm -rf dist && tsc --skipLibCheck"
+    "build:cjs": "rimraf lib && babel src --extensions '.ts' --extensions '.tsx' --ignore '**/__tests__' --ignore '**/__testutils__' -d lib",
+    "build:es": "rimraf es && cross-env ES_MODULES=true babel src --extensions '.ts' --extensions '.tsx' --ignore '**/__tests__' --ignore '**/__testutils__' -d es",
+    "build:typings": "tsc --skipLibCheck -p tsconfig.typings.json",
+    "build": "yarn build:cjs && yarn build:es && yarn build:typings",
+    "lint": "tslint --project . \"src/**/*.{ts,tsx}\""
   },
   "keywords": [
     "react-native",
@@ -19,11 +28,40 @@
     "url": "https://github.com/p-janik/react-native-launch-darkly.git"
   },
   "peerDependencies": {
-    "react-native": "^0.59.0",
-    "react": "16.8.6"
+    "react": "16.8.6",
+    "react-native": "^0.59.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.1.0",
+    "@types/graphql": "^14.0.3",
+    "@types/jest": "^23.3.10",
+    "@types/lodash": "^4.14.119",
+    "@types/react": "^16.8.2",
+    "@types/react-dom": "^16.8.0",
     "@types/react-native": "0.57.63",
-    "typescript": "3.4.1"
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "cross-env": "^5.2.0",
+    "husky": "^1.2.0",
+    "jest": "^23.6.0",
+    "jest-dom": "^2.1.1",
+    "jest-react-profiler": "^0.1.3",
+    "lint-staged": "^8.1.0",
+    "prettier": "~1.15.2",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-hooks-testing-library": "^0.4.1",
+    "react-testing-library": "^6.1.2",
+    "rimraf": "^2.6.2",
+    "standard-version": "^4.4.0",
+    "tslint": "^5.12.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "~3.5.3"
   }
 }

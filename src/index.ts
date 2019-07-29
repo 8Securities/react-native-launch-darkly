@@ -1,9 +1,9 @@
-import { LaunchDarkly } from "./components/client";
 import {
   FlagsProvider,
   FlagsProviderProps,
   useFlagsClient
 } from "./components/FlagsProvider";
+import { LaunchDarkly } from "./components/client";
 import { useBoolFlag } from "./components/useBoolFlag";
 
 export interface ClientOptions {
