@@ -1,6 +1,7 @@
-import React, { ReactNode, ReactElement, useContext } from "react";
+import { ReactNode, ReactElement, useContext } from "react";
 import { LaunchDarkly } from "./client";
 import { ClientOptions, UserOptions } from "..";
+import React from "react";
 
 const LaunchDarklyContext = React.createContext<null | LaunchDarkly>(null);
 

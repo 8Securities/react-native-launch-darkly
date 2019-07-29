@@ -1,6 +1,6 @@
 {
   "name": "react-native-launch-darkly",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "React Native wrapper over LaunchDarkly SDK's for iOS and Android.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,10 +19,10 @@
     "url": "https://github.com/p-janik/react-native-launch-darkly.git"
   },
   "peerDependencies": {
-    "react-native": "^0.41.2"
+    "react-native": "^0.59.0"
   },
   "devDependencies": {
-    "@types/react-native": "0.57.42",
+    "@types/react-native": "0.57.63",
     "typescript": "3.4.1"
   }
 }
